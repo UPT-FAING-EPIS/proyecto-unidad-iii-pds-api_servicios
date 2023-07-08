@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Monitoreo de Servicios</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="{{ url_for('static', filename='scripts/monitor.js') }}"></script>
+</head>
+<body>
+  <h1>Monitoreo de Servicios</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Servicio</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody id="status-container"></tbody>
+  </table>
+</body>
+</html>
