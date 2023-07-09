@@ -84,10 +84,10 @@ WSGI_APPLICATION = 'ServiciosBanco.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'helbert.info',
+        'HOST': 'reyestore.shop',
         'PORT': '3306',
-        'USER': 'APIservicios',
-        'PASSWORD': 'serviciosAPI',
+        'USER': 'arandapi',
+        'PASSWORD': 'aranda',
         'NAME': 'serviciosbanco',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"

@@ -23,19 +23,35 @@ export function PagosLuz() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
-              <th className="py-2 px-4 bg-gray-100">Código pago</th>
-              <th className="py-2 px-4 bg-gray-100">Monto pago</th>
-              <th className="py-2 px-4 bg-gray-100">Fecha de pago</th>
-              <th className="py-2 px-4 bg-gray-100">Código de deuda</th>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Código pago
+              </td>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Monto pago
+              </td>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Fecha de pago
+              </td>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Código de deuda
+              </td>
             </tr>
           </thead>
           <tbody>
             {pagos.map((pago) => (
               <tr key={pago.CodigoPago}>
-                <td className="py-2 px-4">{pago.CodigoPago}</td>
-                <td className="py-2 px-4">{pago.Pago}</td>
-                <td className="py-2 px-4">{pago.FechaPago}</td>
-                <td className="py-2 px-4">{pago.CodigoDeuda}</td>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {pago.CodigoPago}
+                </td>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {pago.Pago}
+                </td>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {pago.FechaPago}
+                </td>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {pago.CodigoDeuda}
+                </td>
               </tr>
             ))}
           </tbody>

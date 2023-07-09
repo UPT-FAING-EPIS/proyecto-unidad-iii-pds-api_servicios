@@ -8,8 +8,8 @@ export interface Clientes {
   }
   
   export interface Deuda {
-    CodigoDeuda: string;
-    FkCodigoCliente: Clientes;
+    codigo_deuda: string;
+    FkCodigoCliente: string;
     FechaVencimientoPago: string; 
     Monto: number;
     Estado: string; 

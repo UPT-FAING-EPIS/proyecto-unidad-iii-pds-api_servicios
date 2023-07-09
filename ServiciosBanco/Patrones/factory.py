@@ -104,7 +104,7 @@ class ServicioLuz(IServicio):
 
         deud_luz_pago = strategy.calculate_payment(deud_luz.Monto, deud_luz.FechaVencimientoPago)
 
-        deud_luz.Monto = Decimal(deud_luz_pago) - self._pago  # Utilizar self._pago directamente
+        deud_luz.Monto = Decimal(deud_luz_pago) - self._pago  
 
         if deud_luz.Monto != 0:
             return {'mensaje': 'El pago no es el debido', 'status': 400}

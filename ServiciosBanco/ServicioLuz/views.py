@@ -111,10 +111,15 @@ class PagoDetailView(generics.RetrieveUpdateDestroyAPIView):
 class DeudaListView(generics.ListCreateAPIView):
     queryset = TbDeuda.objects.using('BaseDatosLuz').all()
     serializer_class = DeudaSerializer
+    def perform_create(self, serializer):
+        serializer.save(using='BaseDatosLuz')
 
 class PagoListView(generics.ListCreateAPIView):
     queryset = TbPagos.objects.using('BaseDatosLuz').all()
     serializer_class = PagosSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(using='BaseDatosLuz')
 
     def post(self, request, *args, **kwargs):
         codigo_deuda = request.data.get('CodigoDeuda', None)

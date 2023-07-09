@@ -11,7 +11,7 @@ export function InicioLuz() {
         Pagos de Luz
       </h1>
       <div className="flex justify-center items-center flex-grow gap-5">
-        <OpcionesInicio to="/Servicios/Luz/Busqueda" text="Pagar Deuda" />
+        <OpcionesInicio to="/Servicios/Luz/RealizarPago" text="Pagar Deuda" />
         <OpcionesInicio to="/Servicios/Luz/Deudas" text="Deudas" />
         <OpcionesInicio to="/Servicios/Luz/Pagos" text="Pagos" />
       </div>
