@@ -35,7 +35,7 @@ export function DeudasLuz() {
                 Fecha de vencimiento
               </td>
               <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
-                Código del alumno
+                Código del Cliente
               </td>
             </tr>
           </thead>
