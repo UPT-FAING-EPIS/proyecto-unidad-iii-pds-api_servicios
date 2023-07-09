@@ -83,8 +83,9 @@ class ServicioEducacion(IServicio):
         
         observer = RabbitObserver()
         observerPagos.attach_observer(observer)
-        observerPagos.notify_observers('Pago realizado exitosamente. Monto final: {}'.format(monto_pago_final),"ServicioEducacion")
-        return Response({'mensaje': 'Pago realizado exitosamente. Monto final: {}'.format(monto_pago_final)}, status=status.HTTP_200_OK)
+        monto_finalfinal = "{:.2f}".format(monto_pago_final)
+        observerPagos.notify_observers('Pago realizado exitosamente. Monto final: {}'.format(monto_finalfinal), "ServicioEducacion")
+        return Response({'mensaje': 'Pago realizado exitosamente. Monto final: {}'.format(monto_finalfinal)}, status=status.HTTP_200_OK)
 
 
 class ServicioLuz(IServicio):

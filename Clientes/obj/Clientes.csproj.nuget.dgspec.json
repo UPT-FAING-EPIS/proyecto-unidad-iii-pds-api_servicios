@@ -1,21 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\hp\\Desktop\\Clientes\\Clientes.csproj": {}
+    "C:\\Users\\LENOVO\\Pictures\\F\\proyecto-unidad-iii-pds-api_servicios\\Clientes\\Clientes.csproj": {}
   },
   "projects": {
-    "C:\\Users\\hp\\Desktop\\Clientes\\Clientes.csproj": {
+    "C:\\Users\\LENOVO\\Pictures\\F\\proyecto-unidad-iii-pds-api_servicios\\Clientes\\Clientes.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\hp\\Desktop\\Clientes\\Clientes.csproj",
+        "projectUniqueName": "C:\\Users\\LENOVO\\Pictures\\F\\proyecto-unidad-iii-pds-api_servicios\\Clientes\\Clientes.csproj",
         "projectName": "Clientes",
-        "projectPath": "C:\\Users\\hp\\Desktop\\Clientes\\Clientes.csproj",
-        "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\hp\\Desktop\\Clientes\\obj\\",
+        "projectPath": "C:\\Users\\LENOVO\\Pictures\\F\\proyecto-unidad-iii-pds-api_servicios\\Clientes\\Clientes.csproj",
+        "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\LENOVO\\Pictures\\F\\proyecto-unidad-iii-pds-api_servicios\\Clientes\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        ],
         "configFilePaths": [
-          "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\LENOVO\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -39,16 +45,6 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
-          "dependencies": {
-            "MySql.Data": {
-              "target": "Package",
-              "version": "[8.0.33, )"
-            },
-            "Swashbuckle.AspNetCore": {
-              "target": "Package",
-              "version": "[6.5.0, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",
@@ -59,15 +55,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "frameworkReferences": {
-            "Microsoft.AspNetCore.App": {
-              "privateAssets": "none"
-            },
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.300\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.413\\RuntimeIdentifierGraph.json"
         }
       }
     }
