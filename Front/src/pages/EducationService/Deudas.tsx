@@ -16,32 +16,37 @@ export function Deudas() {
 
   return (
     <>
-      <Regresar to="/Servicios/Educacion" />
-      <div className="flex flex-col gap-4">
-        <h2>Lista de deudas</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Código deuda</th>
-              <th>Cantidad deuda</th>
-              <th>Estado</th>
-              <th>Fecha de vencimiento</th>
-              <th>Código del alumno</th>
+  <Regresar to="/Servicios/Educacion" />
+  <div className="flex flex-col gap-4">
+    <h2 className="text-xl font-bold">Lista de deudas</h2>
+    <div className="overflow-x-auto">
+      <table className="table-auto w-full">
+        <thead>
+          <tr>
+            <th className="border px-4 py-2">Código deuda</th>
+            <th className="border px-4 py-2">Cantidad deuda</th>
+            <th className="border px-4 py-2">Estado</th>
+            <th className="border px-4 py-2">Fecha de vencimiento</th>
+            <th className="border px-4 py-2">Código del alumno</th>
+          </tr>
+        </thead>
+        <tbody>
+          {deudas.map((deuda) => (
+            <tr key={deuda.CodigoDeuda}>
+              <td className="border text-center px-4 py-2">{deuda.CodigoDeuda}</td>
+              <td className="border text-center px-4 py-2">{deuda.CantidadDeuda}</td>
+              <td className={`border font-bold text-center px-4 py-2 ${deuda.Estado ? 'text-green-600' : 'text-orange-500'}`}>
+                {deuda.Estado ? "Pagado" : "Pendiente"}
+              </td>              
+              <td className="border text-center px-4 py-2">{deuda.FechaVencimiento}</td>
+              <td className="border text-center px-4 py-2">{deuda.fkCodigoAlumno}</td>
             </tr>
-          </thead>
-          <tbody>
-            {deudas.map((deuda) => (
-              <tr key={deuda.CodigoDeuda}>
-                <td>{deuda.CodigoDeuda}</td>
-                <td>{deuda.CantidadDeuda}</td>
-                <td>{deuda.Estado ? "Pagado" : "Pendiente"}</td>
-                <td>{deuda.FechaVencimiento}</td>
-                <td>{deuda.fkCodigoAlumno}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</>
+
   );
 }
