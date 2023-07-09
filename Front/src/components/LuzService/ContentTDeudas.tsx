@@ -18,7 +18,7 @@ export function ContentTDeudas({
       <th scope="row" className="px-6 py-4 text-gray-700">
         {codigo_Deuda}
       </th>
-      <td className="px-6 py-4 text-gray-700">S/. {Monto}</td>
+      <td className="px-6 py-4 text-gray-700">S/.{Monto}</td>
       <td className="px-6 py-4 text-gray-700">{FechaVencimientoPago}</td>
       <td className="px-6 py-4 text-gray-700">{Estado}</td>
       <td className="px-6 py-4 text-gray-700">{FkCodigoCliente}</td>

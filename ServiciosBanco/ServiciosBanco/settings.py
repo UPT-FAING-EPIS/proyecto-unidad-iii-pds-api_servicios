@@ -95,10 +95,10 @@ DATABASES = {
     },
      'BaseDatosEducacion': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST':'localhost',
+        'HOST':'161.132.37.55',
         'PORT':'3306',
         'USER':'root',
-        'PASSWORD':'',
+        'PASSWORD':'upt2023',
         'NAME':'servicioEducacion',
         'OPTIONS':{
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
@@ -117,11 +117,11 @@ DATABASES = {
     },
       'BaseDatosLuz': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST':'localhost',
+        'HOST':'reyestore.shop',
         'PORT':'3306',
-        'USER':'root',
-        'PASSWORD':'',
-        'NAME':'servicioLuz',
+        'USER':'arandapi',
+        'PASSWORD':'aranda',
+        'NAME':'serviciosbanco',
         'OPTIONS':{
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }

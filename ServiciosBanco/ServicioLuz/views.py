@@ -42,7 +42,7 @@ class PagoDTO:
 
 
 class DeudaDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = TbDeuda.objects.all()
+    queryset = TbDeuda.objects.using('BaseDatosLuz').all()
     serializer_class = DeudaSerializer
 
     def retrieve(self, request, *args, **kwargs):
@@ -76,7 +76,7 @@ class DeudaDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class PagoDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = TbPagos.objects.all()
+    queryset = TbPagos.objects.using('BaseDatosLuz').all()
     serializer_class = PagosSerializer
 
     def retrieve(self, request, *args, **kwargs):
@@ -109,11 +109,11 @@ class PagoDetailView(generics.RetrieveUpdateDestroyAPIView):
         )
 
 class DeudaListView(generics.ListCreateAPIView):
-    queryset = TbDeuda.objects.all()
+    queryset = TbDeuda.objects.using('BaseDatosLuz').all()
     serializer_class = DeudaSerializer
 
 class PagoListView(generics.ListCreateAPIView):
-    queryset = TbPagos.objects.all()
+    queryset = TbPagos.objects.using('BaseDatosLuz').all()
     serializer_class = PagosSerializer
 
     def post(self, request, *args, **kwargs):
