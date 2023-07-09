@@ -15,25 +15,31 @@ export function RealizarPago() {
     setValue,
   } = useForm();
   const navigate = useNavigate();
+
   const location = useLocation();
   const [errorMessage, setErrorMessage] = useState("");
   const searchParams = new URLSearchParams(location.search);
   const codigoDeuda = searchParams.get("codigoDeuda");
   const montoPago = searchParams.get("MontoPago");
+  const codigoCuenta = searchParams.get("CodigoCuenta");
 
   useEffect(() => {
     if (codigoDeuda) {
       setValue("CodigoDeuda", codigoDeuda);
     }
+    if (codigoCuenta) {
+      setValue("CodigoCuenta", codigoCuenta);
+    }
     if (montoPago) {
       setValue("MontoPago", montoPago);
     }
-  }, [codigoDeuda, montoPago, setValue]);
+  }, [codigoDeuda, codigoCuenta, montoPago, setValue]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
       const deudaData: Deuda = {
-        CodigoDeuda: parseInt(data.CodigoDeuda),
+        CodigoDeuda: data.CodigoDeuda,
+        CodigoCuenta: data.CodigoCuenta,
         MontoPago: parseInt(data.MontoPago),
       };
       const res = await pagarDeuda(deudaData);
@@ -53,9 +59,22 @@ export function RealizarPago() {
       console.log(error);
 
       if (axios.isAxiosError(error) && error.response?.status === 404) {
-        setErrorMessage("No se ha encontrado el ID del usuario");
+        setErrorMessage("No se ha encontrado la cuenta");
       } else if (axios.isAxiosError(error) && error.response?.status === 400) {
         setErrorMessage(error.response.data.mensaje);
+        const errorMessage = error.response.data.mensaje;
+        if (errorMessage === "La deuda ya ha sido pagada.") {
+          toast.success("La deuda ya ha sido pagada.", {
+            position: "top-center",
+            style: {
+              background: "#202033",
+              color: "#fff",
+            },
+          });
+          navigate("/Servicios/Educacion/");
+        } else {
+          setErrorMessage((error as Error).message);
+        }
       } else {
         setErrorMessage((error as Error).message);
       }
@@ -65,6 +84,7 @@ export function RealizarPago() {
   return (
     <>
       <Regresar to="/Servicios/Educacion/BusquedaPago" />
+      <h1>Formulario de Pago</h1>
       <form
         onSubmit={onSubmit}
         className="flex flex-col gap-4 items-center mx-auto mt-4"
@@ -79,6 +99,17 @@ export function RealizarPago() {
         />
         {errors.CodigoDeuda && (
           <span className="text-red-500">Código de deuda requerido</span>
+        )}
+
+        <input
+          type="number"
+          min="0"
+          placeholder="Codigo Cuenta"
+          {...register("CodigoCuenta", { required: true })}
+          className="p-2 rounded border border-gray-300"
+        />
+        {errors.CodigoDeuda && (
+          <span className="text-red-500">Código de Cuenta requerido</span>
         )}
 
         <input

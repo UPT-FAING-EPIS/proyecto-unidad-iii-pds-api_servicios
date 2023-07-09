@@ -6,7 +6,7 @@ export const obtenerDeudores = () => {
 };
 
 export const pagarDeuda = (pago: Deuda) => {
-  return axios.post("http://127.0.0.1:8000/ServicioEducacion/pagar/", pago);
+  return axios.post("http://127.0.0.1:8000/ServicioEducacion/pagarDebito/", pago);
 };
 
 export const buscarDeuda = (cod: number) => {

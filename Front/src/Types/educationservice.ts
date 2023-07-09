@@ -4,10 +4,11 @@ export type Deudor = {
   CantidadDeuda: string;
   FechaVencimiento: string;
   Estado: boolean;
-  Situacion?:string;
+  Situacion?: string;
 };
 export type Deuda = {
   CodigoDeuda: number;
+  CodigoCuenta: number;
   MontoPago: number;
 };
 export type Pago = {
