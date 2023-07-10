@@ -50,7 +50,7 @@ export function RealizarPago() {
         position: "top-right",
         style,
       });
-      navigate("/Servicios/Educacion");
+      navigate("/Servicios/Luz");
     } catch (error) {
       console.log(error);
 
