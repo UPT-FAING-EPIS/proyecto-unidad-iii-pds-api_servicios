@@ -1116,4 +1116,1867 @@ class InterestPaymentStrategy(PaymentStrategy):
             return amount
 ```
 ### PARTE III: Creacion de Frontend con React + Django para cada servicio
+#### 1. Configuración del proyecto
+1.1. Comenzamos configurando un nuevo proyecto de React utilizando herramientas como Create React App. Luego, configuramos un proyecto de Django y usamos las API ya creadas para cada servicio. Ejecuta el siguiente comando para crear un nuevo proyecto de React:
+```lua
+npx create-react-app Front
+```
+1.2. Inicia la aplicación de React ejecutando el siguiente comando:
+```lua
+npm start
+```
+#### 2. Creación de modelos:
+2.1. Models Servicios Educacion
+> educationservice.ty
+```typescript
+export type Deudor = {
+  CodigoDeuda: number;
+  fkCodigoAlumno: string;
+  CantidadDeuda: string;
+  FechaVencimiento: string;
+  Estado: boolean;
+  Situacion?: string;
+};
+export type Deuda = {
+  CodigoDeuda: number;
+  CodigoCuenta: number;
+  MontoPago: number;
+};
+export type Pago = {
+  CodigoPago: number;
+  FKCodigoDeuda: number;
+  MontoPago: string;
+  FechaPago: string;
+};
 
+```
+2.2. Models Servicios Internet
+> internetservice.ty
+```typescript
+export type Deudor = {
+  CodigoDeudInter: number;
+  Nombre: string;
+  Apellido: string;
+  MonDeuda: number;
+  FechVenc: Date;
+  Estado: boolean;
+
+};
+
+
+export type Deuda = {
+  CodigoDeudInter: number;
+  MonPago: number;
+};
+```
+2.3. Models Servicios luz
+> luzservice.ty
+```typescript
+export interface Clientes {
+    CodigoDeuda: string;
+    FkCodigoCliente: string;
+    Monto: number;
+    FechaVencimientoPago: string; 
+    Estado: string; 
+    Situacion?:string;
+  }
+  
+  export interface Deuda {
+    codigo_deuda: string;
+    FkCodigoCliente: string;
+    FechaVencimientoPago: string; 
+    Monto: number;
+    Estado: string; 
+  }
+  
+  export interface Pagos {
+    CodigoPago: string;
+    CodigoDeuda: number;
+    Pago: number;
+    FechaPago: string; 
+  }
+  
+```
+2.4. Models Servicios Telefonia
+> telephonyservice.ty
+```typescript
+export type Factura = {
+    id : number;
+    cliente : number;
+    plan : number;
+    monto : number;
+    fecha_emision : string;
+    fecha_vencimiento : string;
+    pagado: boolean;
+    estado:boolean;
+  };
+  export type Llamadas = {
+    id : number;
+    fecha_hora: string;
+    duracion: number;
+    cliente_id : number;
+  };
+  export type Plan = {
+    id : number;
+    nombre : string;
+    costo_mensual : number;
+    minutos_incluidos : number;
+    datos_incluidos : number;
+  };
+  export type Cliente = {
+    id : number;
+    nombre : string;
+    direccion  : string;
+    telefono  : string;
+    cuenta_bancaria  : string;
+    servicio_activo :boolean;
+  };
+```
+#### 3. Conexión entre React y la API REST de Django:
+3.1. Para conectar React con la API REST de Django, utilizaremos la biblioteca axios en React para realizar solicitudes HTTP a los endpoints de la API. Podemos definir funciones en React que hagan uso de axios para obtener y enviar datos a través de la API. Estas funciones se pueden llamar desde los componentes de React para interactuar con el backend y mostrar los datos en la interfaz de usuario.
+> education.api.ts
+```typescript
+import axios from "axios";
+import { Deuda } from "../Types/educationservice";
+
+export const obtenerDeudores = () => {
+  return axios.get("http://127.0.0.1:8000/ServicioEducacion/deudas/");
+};
+
+export const pagarDeuda = (pago: Deuda) => {
+  return axios.post("http://127.0.0.1:8000/ServicioEducacion/pagarDebito/", pago);
+};
+
+export const buscarDeuda = (cod: number) => {
+  return axios.get(`http://127.0.0.1:8000/ServicioEducacion/listardeudores/${cod}/`);
+};
+export const obtenerPagos = () => {
+  return axios.get("http://127.0.0.1:8000/ServicioEducacion/pagos/");
+};
+```
+> internet.api.ts
+```typescript
+import axios from "axios";
+import { Deuda } from "../Types/internetservice";
+
+export const obtenerDeudores = () => {
+  return axios.get("http://127.0.0.1:8000/ServicioInternet/Deudores/");
+};
+
+export const buscarDeuda = (cod: number) => {
+  return axios.get(`http://127.0.0.1:8000/ServicioInternet/Deudores/${cod}/`);
+};
+
+export const pagarDeuda = (cod:number,pago: Deuda) => {
+  return axios.patch(`http://127.0.0.1:8000/ServicioInternet/pagoInter/${cod}/`, pago);
+};
+```
+> luz.api.ts
+```typescript
+import axios from "axios";
+import { Pagos } from "../Types/luzservice";
+
+
+export const obtenerDeudores = () => {
+  return axios.get("http://127.0.0.1:8000/ServicioLuz/deudas/");
+};
+
+export const pagarDeuda = (pagoData: Pagos) => {
+  return axios.post("http://127.0.0.1:8000/ServicioLuz/pagos/", pagoData);
+};
+
+export const buscarDeuda = (cod: number) => {
+  return axios.get(`http://127.0.0.1:8000/ServicioLuz/deudas/${cod}/`);
+};
+export const obtenerPagos = () => {
+  return axios.get("http://127.0.0.1:8000/ServicioLuz/pagos/");
+};
+```
+> Telephony.ts
+```typescript
+import axios from "axios";
+import { Plan } from "../Types/telephonyservice";
+
+export const obtenerplan = () => {
+  return axios.get("http://127.0.0.1:8000/ServicioTelefonia/planes/");
+};
+
+export const elegirplan = (cliente_id: number, plan_id: number, monto_pago: number) => {
+  console.log("Datos enviados:", cliente_id, plan_id, monto_pago);
+  return axios.post("http://127.0.0.1:8000/ServicioTelefonia/facturas/activar_plan/", {
+    cliente_id: cliente_id,
+    plan_id: plan_id,
+    monto_pago: monto_pago
+  });
+};
+
+export const pagarDeuda = (plan: Plan) => {
+    return axios.post("http://127.0.0.1:8000/ServicioTelefonia/planes/", plan);
+};
+  
+export const buscarcliente = (id: number) => {
+  return axios.get(`http://127.0.0.1:8000/ServicioTelefonia/clientes/${id}/`);
+};
+
+export const actualizarsaldo = (id: number,nombre: string, direccion: string, telefono: string, cuenta_bancaria: number, servicio_activo: number) => {
+  return axios.put(`http://127.0.0.1:8000/ServicioTelefonia/clientes/${id}/`,{
+    nombre: nombre,
+    direccion: direccion,
+    telefono: telefono,
+    cuenta_bancaria: cuenta_bancaria,
+    servicio_activo: servicio_activo
+  });
+};
+
+export const obtenerfactura = () => {
+  return axios.get("http://127.0.0.1:8000/ServicioTelefonia/facturas/");
+};
+
+export const obtenercliente = () => {
+    return axios.get("http://127.0.0.1:8000/ServicioTelefonia/clientes/");
+  };
+```
+#### 4. Creación de Router en React:
+4.1. Primero configuramos el app.txs en la que se definira las rutas de cada servicio:
+> app.txs
+```javascript
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { MainServicesPages } from "./pages/MainServicesPages";
+import { Navigation } from "./components/Navigation";
+import { Toaster } from "react-hot-toast";
+import { EducacionRoutes } from "./routes/EducacionRoutes";
+import { InternetRoutes } from "./routes/InternetRoutes";
+import { ClienteRoutes } from "./routes/ClienteRoutes";
+import { TelephonyRoutes } from "./routes/TelephonyRoutes";
+import { LuzRoutes } from "./routes/LuzRoutes";
+import { InicioAgua } from "./pages/AguaService/InicioAgua";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="container mx-auto px-2">
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<Navigate to="/Servicios" />} />
+          <Route path="/Servicios" element={<MainServicesPages />} />
+          <Route path="/Servicios/Educacion/*" element={<EducacionRoutes />} />
+          <Route path="/Servicios/Luz/*" element={<LuzRoutes/>} />
+          <Route path="/Servicios/Internet/*" element={< InternetRoutes/>} />
+          <Route path="/Servicios/Telefonia/*" element={<TelephonyRoutes/>} />
+          <Route path="/Cliente/*" element={< ClienteRoutes/>} />
+          <Route path="/Servicios/Agua/" element={< InicioAgua/>} />
+        </Routes>
+        <Toaster />
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+
+```
+4.2. luego creamos las subrutas de cada servicio:
+> EducacionRoutes.txs
+```javascript
+import { Route, Routes } from "react-router-dom";
+import { InicioEducation } from "../pages/EducationService/InicioEducacion";
+import { Deudas } from "../pages/EducationService/Deudas";
+import { Pagos } from "../pages/EducationService/Pagos";
+import { BusquedaPago } from "../pages/EducationService/BusquedaPago";
+import { PagarDeudas } from "../pages/EducationService/PagarDeudas";
+import { RealizarPago } from "../pages/EducationService/RealizarPago";
+
+export const EducacionRoutes = () => (
+  <Routes>
+    <Route path="/" element={<InicioEducation />} />
+    <Route path="/Deudas" element={<Deudas />} />
+    <Route path="/Pagos" element={<Pagos />} />
+    <Route path="/Pagar" element={<PagarDeudas />} />
+    <Route path="/RealizarPago" element={<RealizarPago />} />
+    <Route path="/BusquedaPago" element={<BusquedaPago />} />
+  </Routes>
+);
+```
+> InternetRoutes.txs
+```javascript
+import { Route, Routes } from "react-router-dom";
+
+import { InicioInternet } from "../pages/InternetService/InicioInternet";
+import { DeudoresInternet } from "../pages/InternetService/DeudoresInternet";
+import { BusquedaPagoInternet } from "../pages/InternetService/PagosInternet";
+import { RealizarPagoInternet } from "../pages/InternetService/RealizarPago";
+
+
+export const InternetRoutes = () => (
+  <Routes>
+    <Route path="/" element={<InicioInternet />} />
+    <Route path="/Deudores" element={<DeudoresInternet />} />
+    <Route path="/Pagar" element={<BusquedaPagoInternet />} />
+    <Route path="/RealizarPago" element={<RealizarPagoInternet />} />
+  </Routes>
+);
+```
+> LuzRoutes.txs
+```javascript
+import { Route, Routes } from "react-router-dom";
+import { InicioLuz } from "../pages/LuzService/InicioLuz";
+import { DeudasLuz } from "../pages/LuzService/Deudas";
+import { PagosLuz } from "../pages/LuzService/PagoLuz";
+import { RealizarPago } from "../pages/LuzService/RealizarPago";
+
+
+export const LuzRoutes = () => (
+  <Routes>
+    <Route path="/" element={<InicioLuz/>} />
+    <Route path="/Deudas" element={<DeudasLuz />} />
+    <Route path="/Pagos" element={<PagosLuz />} />
+    <Route path="/RealizarPago" element={<RealizarPago />} />
+
+  </Routes>
+);
+```
+> TelephonyRoutes.txs
+```javascript
+import { Route, Routes } from "react-router-dom";
+import { IndexService } from "../pages/TelephonyService/IndexService";
+import { Facturas } from "../pages/TelephonyService/Facturas";
+import { Planes } from "../pages/TelephonyService/Plan";
+import { RealizarPago } from "../pages/TelephonyService/RealizarPago";
+
+export const TelephonyRoutes = () => (
+  <Routes>
+    <Route path="/" element={<IndexService />} />
+    <Route path="/Facturas" element={<Facturas />} />
+    <Route path="/Planes" element={<Planes />} />
+    <Route path="/RealizarPago" element={<RealizarPago />} />
+  </Routes>
+);
+```
+#### 5. Desarrollo de las vistas y funcionalidades del frontend:
+#### En esta etapa, nos enfocaremos en desarrollar las vistas y funcionalidades específicas del frontend:
+---
+5.1. Sevicio Educacion 
+> BusquedaPago.tsx
+```javascript
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { buscarDeuda } from "../../api/education.api.ts";
+import { Deudor } from "../../Types/educationservice.ts";
+import { ContentTDeudas } from "../../components/EducationService/ContentTDeudas";
+import { Regresar } from "../../components/Regresar.tsx";
+
+export function BusquedaPago() {
+  const [deudores, setDeudores] = useState<Deudor[]>([]);
+  const [error, setError] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = handleSubmit(async (data) => {
+    const codigoEstudiante = data.codigoEstudiante;
+
+    try {
+      const response = await buscarDeuda(parseInt(codigoEstudiante));
+      setDeudores(response.data);
+      setError("");
+    } catch (error) {
+      console.log(error);
+      setDeudores([]);
+      setError("Alumno no encontrado");
+    }
+  });
+
+  return (
+    <>
+      <Regresar to="/Servicios/Educacion/Pagar" />
+      <div className="mt-4">
+        <form onSubmit={onSubmit}>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg
+                className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                />
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="default-search"
+              {...register("codigoEstudiante", { required: true })}
+              className="block w-full p-4 pl-10 text-lg text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Ingrese el código del estudiante"
+              required
+            />
+            {errors.codigoEstudiante && (
+              <span className="text-red-500">
+                Código de estudiante requerido
+              </span>
+            )}
+            <button
+              type="submit"
+              className="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-lg px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Search
+            </button>
+          </div>
+        </form>{" "}
+        <div className="container mx-auto px-4 py-8">
+          {error && <p className="text-red-500">{error}</p>}
+          {deudores.length > 0 ? (
+            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+              <table className="w-full text-sm text-left text-gray-300 dark:text-gray-300">
+                <thead className="text-xs text-gray-600 uppercase dark:text-gray-300">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Codigo de deuda
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Cantidad
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Vencimiento
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Estado
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Codigo Estudiante
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Accion
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {deudores.map((deudor) => (
+                    <ContentTDeudas
+                      key={deudor.CodigoDeuda}
+                      codigoDeuda={deudor.CodigoDeuda.toString()}
+                      cantidadDeuda={deudor.CantidadDeuda}
+                      fechaVencimiento={deudor.FechaVencimiento}
+                      estado={deudor.Situacion}
+                      codigoestudiante={deudor.fkCodigoAlumno}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </>
+  );
+}
+```
+> Deudas.tsx
+```javascript
+import { useEffect, useState } from "react";
+import { obtenerDeudores } from "../../api/education.api.ts";
+import { Deudor } from "../../Types/educationservice.ts";
+import { Regresar } from "../../components/Regresar";
+
+export function Deudas() {
+  const [deudas, setDeudas] = useState<Deudor[]>([]); // Especifica el tipo de estado como un array de Deudor
+
+  useEffect(() => {
+    async function cargarDeudas() {
+      const res = await obtenerDeudores();
+      setDeudas(res.data); // Actualiza el estado con los datos de deudas
+    }
+    cargarDeudas();
+  }, []);
+
+  return (
+    <>
+  <Regresar to="/Servicios/Educacion" />
+  <div className="flex flex-col gap-4">
+    <h2 className="text-xl font-bold">Lista de deudas</h2>
+    <div className="overflow-x-auto">
+      <table className="table-auto w-full">
+        <thead>
+          <tr>
+            <th className="border px-4 py-2">Código deuda</th>
+            <th className="border px-4 py-2">Cantidad deuda</th>
+            <th className="border px-4 py-2">Estado</th>
+            <th className="border px-4 py-2">Fecha de vencimiento</th>
+            <th className="border px-4 py-2">Código del alumno</th>
+          </tr>
+        </thead>
+        <tbody>
+          {deudas.map((deuda) => (
+            <tr key={deuda.CodigoDeuda}>
+              <td className="border text-center px-4 py-2">{deuda.CodigoDeuda}</td>
+              <td className="border text-center px-4 py-2">{deuda.CantidadDeuda}</td>
+              <td className={`border font-bold text-center px-4 py-2 ${deuda.Estado ? 'text-green-600' : 'text-orange-500'}`}>
+                {deuda.Estado ? "Pagado" : "Pendiente"}
+              </td>              
+              <td className="border text-center px-4 py-2">{deuda.FechaVencimiento}</td>
+              <td className="border text-center px-4 py-2">{deuda.fkCodigoAlumno}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</>
+
+  );
+}
+```
+> InicioEducacion.tsx
+```javascript
+import { OpcionesInicio } from "../../components/OpcionesInicio";
+import { Regresar } from "../../components/Regresar";
+
+export function InicioEducation() {
+  return (
+    <div className="flex flex-col">
+      <div>
+      <Regresar to="/Servicios" />
+      </div>
+      <h1 className="text-4xl font-bold mb-24 text-left mt-2">
+        Pagos de Educación
+      </h1>
+      <div className="flex justify-center items-center flex-grow gap-5">
+        <OpcionesInicio to="/Servicios/Educacion/Pagar" text="Pagar Deuda" />
+        <OpcionesInicio to="/Servicios/Educacion/Deudas" text="Deudas" />
+        <OpcionesInicio to="/Servicios/Educacion/Pagos" text="Pagos" />
+      </div>
+    </div>
+  );
+}
+```
+> PagarDeudas.tsx
+```javascript
+import { CardOptions } from "../../components/CardOptions";
+import { Regresar } from "../../components/Regresar";
+import logoupt from "../../assets/images/LogoUpt.png"
+import logounjbg from "../../assets/images/LogoUnjbg.png"
+
+export function PagarDeudas() {
+  return (
+    <>
+      {/* Componente Regresar para volver a la página anterior */}
+      <Regresar to="/Servicios/Educacion" />
+      <div className="container mx-auto px-4 py-8">
+        {/* Título de la página */}
+        <h1 className="text-3xl font-bold mb-4">Elija la entidad</h1>
+        <div className="max-w-md mx-auto gap-10 flex flex-row">
+          {/* Componente CardOptions para mostrar una opción de pago */}
+          <CardOptions
+            imageSrc={logoupt}
+            altText="Logo Upt"
+            to="/Servicios/Educacion/BusquedaPago"
+          />
+          {/* Componente CardOptions para mostrar otra opción de pago */}
+          <CardOptions
+            imageSrc={logounjbg}
+            altText="Logo Unjbg"
+            to="/"
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+```
+> Pagos.tsx
+```javascript
+import { Regresar } from "../../components/Regresar";
+import { useEffect, useState } from "react";
+import { obtenerPagos } from "../../api/education.api.ts";
+import { Pago } from "../../Types/educationservice.ts";
+
+export function Pagos() {
+  // Estado para almacenar los pagos
+  const [pagos, setPagos] = useState<Pago[]>([]);
+
+  useEffect(() => {
+    // Función asincrónica para cargar los pagos
+    async function cargarPagos() {
+      // Llamada a la API para obtener los pagos
+      const res = await obtenerPagos();
+      // Actualizar el estado con los datos de los pagos recibidos
+      setPagos(res.data);
+      console.log(res);
+    }
+    // Llamar a la función cargarPagos cuando el componente se monta
+    cargarPagos();
+  }, []);
+
+  return (
+    <>
+      {/* Componente Regresar para volver a la página anterior */}
+      <Regresar to="/Servicios/Educacion" />
+      <div className="flex flex-col gap-4">
+        {/* Título de la lista de pagos */}
+        <h2 className="text-xl font-bold">Lista de pagos</h2>
+        <div className="overflow-x-auto">
+          {/* Tabla para mostrar los pagos */}
+          <table className="table-auto w-full">
+            <thead>
+              <tr>
+                <th className="border px-4 py-2">Código pago</th>
+                <th className="border px-4 py-2">Monto pago</th>
+                <th className="border px-4 py-2">Fecha de pago</th>
+                <th className="border px-4 py-2">Código de deuda</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* Mapeo de los pagos para mostrar cada fila de la tabla */}
+              {pagos.map((pago) => (
+                <tr key={pago.CodigoPago}>
+                  <td className="border text-center px-4 py-2">
+                    {pago.CodigoPago}
+                  </td>
+                  <td className="border text-center px-4 py-2">
+                    {pago.MontoPago}
+                  </td>
+                  <td className="border text-center px-4 py-2">
+                    {pago.FechaPago}
+                  </td>
+                  <td className="border text-center px-4 py-2">
+                    {pago.FKCodigoDeuda}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
+}
+```
+> RealizarPago.tsx
+```javascript
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { pagarDeuda } from "../../api/education.api.ts";
+import { Deuda } from "../../Types/educationservice.ts";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+import { Regresar } from "../../components/Regresar.tsx";
+
+export function RealizarPago() {
+  // Configuración del formulario con react-hook-form
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm();
+  
+  // Utilidad de navegación de react-router-dom
+  const navigate = useNavigate();
+
+  // Obtener la ubicación actual de react-router-dom
+  const location = useLocation();
+  
+  // Estado para el mensaje de error
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Obtener parámetros de búsqueda de la URL
+  const searchParams = new URLSearchParams(location.search);
+  const codigoDeuda = searchParams.get("codigoDeuda");
+  const montoPago = searchParams.get("MontoPago");
+  const codigoCuenta = searchParams.get("CodigoCuenta");
+
+  // Cargar los valores iniciales en los campos del formulario
+  useEffect(() => {
+    if (codigoDeuda) {
+      setValue("CodigoDeuda", codigoDeuda);
+    }
+    if (codigoCuenta) {
+      setValue("CodigoCuenta", codigoCuenta);
+    }
+    if (montoPago) {
+      setValue("MontoPago", montoPago);
+    }
+  }, [codigoDeuda, codigoCuenta, montoPago, setValue]);
+
+  // Función para manejar el envío del formulario
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      // Crear objeto de deuda con los datos del formulario
+      const deudaData: Deuda = {
+        CodigoDeuda: data.CodigoDeuda,
+        CodigoCuenta: data.CodigoCuenta,
+        MontoPago: parseInt(data.MontoPago),
+      };
+
+      // Realizar el pago de la deuda llamando a la API
+      const res = await pagarDeuda(deudaData);
+      console.log(res);
+
+      // Mostrar una notificación de éxito
+      const style = {
+        background: "#202033",
+        color: "#fff",
+      };
+      toast.success("Pago realizado correctamente", {
+        position: "top-right",
+        style,
+      });
+
+      // Navegar a la página de servicios de educación
+      navigate("/Servicios/Educacion");
+    } catch (error) {
+      console.log(error);
+
+      // Manejo de errores específicos
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        setErrorMessage("No se ha encontrado la cuenta");
+      } else if (axios.isAxiosError(error) && error.response?.status === 400) {
+        setErrorMessage(error.response.data.mensaje);
+
+        const errorMessage = error.response.data.mensaje;
+        if (errorMessage === "La deuda ya ha sido pagada.") {
+          toast.success("La deuda ya ha sido pagada.", {
+            position: "top-center",
+            style: {
+              background: "#202033",
+              color: "#fff",
+            },
+          });
+          navigate("/Servicios/Educacion/");
+        } else {
+          setErrorMessage((error as Error).message);
+        }
+      } else {
+        setErrorMessage((error as Error).message);
+      }
+    }
+  });
+
+  return (
+    <>
+      {/* Componente Regresar para volver a la página anterior */}
+      <Regresar to="/Servicios/Educacion/BusquedaPago" />
+
+      {/* Título del formulario */}
+      <h1>Formulario de Pago</h1>
+
+      {/* Formulario */}
+      <form
+        onSubmit={onSubmit}
+        className="flex flex-col gap-4 items-center mx-auto mt-4"
+      >
+        {/* Campo para el código de deuda */}
+        <input
+          type="number"
+          min="0"
+          placeholder="Código de deuda"
+          {...register("CodigoDeuda", { required: true })}
+          className="p-2 rounded border border-gray-300"
+          disabled
+        />
+        {errors.CodigoDeuda && (
+          <span className="text-red-500">Código de deuda requerido</span>
+        )}
+
+        {/* Campo para el código de cuenta */}
+        <input
+          type="number"
+          min="0"
+          placeholder="Codigo Cuenta"
+          {...register("CodigoCuenta", { required: true })}
+          className="p-2 rounded border border-gray-300"
+        />
+        {errors.CodigoDeuda && (
+          <span className="text-red-500">Código de Cuenta requerido</span>
+        )}
+
+        {/* Campo para el monto de pago */}
+        <input
+          type="number"
+          min="0"
+          placeholder="Cantidad de deuda"
+          {...register("MontoPago", { required: true })}
+          className="p-2 rounded border border-gray-300"
+          disabled
+        />
+        {errors.MontoPago && (
+          <span className="text-red-500">Monto de pago requerido </span>
+        )}
+
+        {/* Mostrar mensaje de error */}
+        {errorMessage && <span className="text-red-500">{errorMessage}</span>}
+
+        {/* Botones de cancelar y guardar */}
+        <div className="flex gap-4">
+          <Link
+            to="/Servicios/Educacion"
+            className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
+          >
+            Cancelar
+          </Link>
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          >
+            Guardar
+          </button>
+        </div>
+      </form>
+    </>
+  );
+}
+
+```
+5.2. Sevicio Internet
+> DeudoresInternet.tsx
+```javascript
+import { useEffect, useState } from "react";
+import { obtenerDeudores } from "../../api/internet.api.ts";
+import { Deudor } from "../../Types/internetservice.ts";
+import { Regresar } from "../../components/Regresar";
+
+export function DeudoresInternet() {
+  const [deudas, setDeudas] = useState<Deudor[]>([]); // Especifica el tipo de estado como un array de Deudor
+
+  useEffect(() => {
+    async function cargarDeudas() {
+      const res = await obtenerDeudores();
+      setDeudas(res.data); // Actualiza el estado con los datos de deudas
+    }
+    cargarDeudas();
+  }, []);
+
+  return (
+    <>
+      <Regresar to="/Servicios/Internet" />
+      <div className="flex flex-col gap-4">
+        <h2 className="text-xl font-bold">Lista de deudores</h2>
+
+        <table className="table-auto">
+          <thead>
+            <tr>
+              <th className="border px-4 py-2">Código</th>
+              <th className="border px-4 py-2">Nombre</th>
+              <th className="border px-4 py-2">Apellido</th>
+              <th className="border px-4 py-2">Monto Deuda</th>
+              <th className="border px-4 py-2">Fecha de vencimiento</th>
+              <th className="border px-4 py-2">Estado</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {deudas.map((deuda) => (
+              <tr key={deuda.CodigoDeudInter}>
+                <td className="border px-4 py-2">{deuda.CodigoDeudInter}</td>
+                <td className="border px-4 py-2">{deuda.Nombre}</td>
+                <td className="border px-4 py-2">{deuda.Apellido}</td>
+                <td className="border px-4 py-2">{deuda.MonDeuda}</td>
+                <td className="border px-4 py-2">{deuda.FechVenc}</td>
+                <td className="border px-4 py-2">{deuda.Estado ? "Pagado" : "Pendiente"}</td>
+
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+```
+> InicioInternet.tsx
+```javascript
+import { OpcionesInicio } from "../../components/OpcionesInicio";
+import { Regresar } from "../../components/Regresar";
+
+export function InicioInternet() {
+  return (
+    <div className="flex flex-col">
+      <div>
+      <Regresar to="/Servicios" />
+      </div>
+      <h1 className="text-4xl font-bold mb-24 text-left mt-2">
+        Pagos de Internet
+      </h1>
+      <div className="flex justify-center items-center flex-grow gap-5">
+        <OpcionesInicio to="/Servicios/Internet/Pagar" text="Pagar Deuda" />
+        <OpcionesInicio to="/Servicios/Internet/Deudores" text="Deudores" />
+      </div>
+    </div>
+  );
+}
+```
+> PagosInternet.tsx
+```javascript
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { buscarDeuda } from "../../api/education.api.ts";
+import { Deudor } from "../../Types/educationservice.ts";
+import { ContentTDeudas } from "../../components/EducationService/ContentTDeudas";
+import { Regresar } from "../../components/Regresar.tsx";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+import { buscarDeuda } from "../../api/internet.api.ts";
+import { Deudor } from "../../Types/internetservice.ts";
+
+import { ContentTDeudas } from "../../components/InternetService/ContentTDeudas";
+import { Regresar } from "../../components/Regresar.tsx";
+
+
+export function BusquedaPagoInternet() {
+  const [deudores, setDeudores] = useState<Deudor[]>([]);
+  const [error, setError] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = handleSubmit(async (data) => {
+    const CodigoDeudInter = data.CodigoDeudInter;
+
+    try {
+      const response = await buscarDeuda(parseInt(CodigoDeudInter));
+      setDeudores([response.data]);
+      setError("");
+    } catch (error) {
+      console.log(error);
+      setDeudores([]);
+      setError("Deudor no encontrado");
+    }
+  });
+
+
+  return (
+    <>
+      <Regresar to="/Servicios/Internet/" />
+      <div className="mt-4">
+        <form onSubmit={onSubmit}>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg
+                className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                />
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="default-search"
+              {...register("CodigoDeudInter", { required: true })}
+              className="block w-full p-4 pl-10 text-lg text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Ingrese el código del Deudor"
+              required
+            />
+            {errors.CodigoDeudInter && (
+              <span className="text-red-500">
+                Código de Deudor requerido
+              </span>
+            )}
+            <button
+              type="submit"
+              className="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-lg px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Search
+            </button>
+          </div>
+        </form>{" "}
+
+        <div className="container mx-auto px-4 py-8">
+          {error && <p className="text-red-500">{error}</p>}
+          {console.log(deudores)}
+          {console.log(deudores.length)}
+          {deudores.length > 0 ? (
+            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+              <table className="w-full text-sm text-left text-gray-300 dark:text-gray-300">
+                <thead className="text-xs text-gray-600 uppercase dark:text-gray-300">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Codigo de deuda
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Monto de Deuda
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      FechVenc
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Estado
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Accion
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {deudores.map((deudor) => (
+                    <ContentTDeudas
+                      key={deudor.CodigoDeudInter}
+                      CodigoDeudInter={deudor.CodigoDeudInter.toString()}
+                      MonDeuda={deudor.MonDeuda}
+                      FechVenc={deudor.FechVenc}
+                      Estado={deudor.Estado}
+                    />
+                  ))}
+                </tbody>
+                
+
+
+              </table>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </>
+  );
+}
+
+```
+> RealizarPago.tsx
+```javascript
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+
+import { pagarDeuda } from "../../api/internet.api.ts";
+import { Deuda } from "../../Types/internetservice";
+
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+import { Regresar } from "../../components/Regresar.tsx";
+
+export function RealizarPagoInternet() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [errorMessage, setErrorMessage] = useState("");
+  const searchParams = new URLSearchParams(location.search);
+  const codigoDeuda = searchParams.get("codigoDeuda");
+  const montoPago = searchParams.get("MontoPago");
+
+  useEffect(() => {
+    if (codigoDeuda) {
+      setValue("CodigoDeuda", codigoDeuda);
+    }
+    if (montoPago) {
+      setValue("MontoPago", montoPago);
+    }
+  }, [codigoDeuda, montoPago, setValue]);
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      const deudaData: Deuda = {
+        CodigoDeudInter: parseInt(data.CodigoDeuda),
+        MonPago: parseInt(data.MontoPago),
+      };
+      const res = await pagarDeuda(parseInt(data.CodigoDeuda),deudaData);
+      console.log(res);
+
+      const style = {
+        background: "#202033",
+        color: "#fff",
+      };
+
+      toast.success("Pago realizado correctamente", {
+        position: "top-right",
+        style,
+      });
+      navigate("/Servicios/Internet");
+    } catch (error) {
+      console.log(error);
+
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        setErrorMessage("No se ha encontrado el ID del usuario");
+      } else if (axios.isAxiosError(error) && error.response?.status === 400) {
+        setErrorMessage(error.response.data.mensaje);
+      } else {
+        setErrorMessage((error as Error).message);
+      }
+    }
+  });
+
+  return (
+    <>
+      <Regresar to="/Servicios/Internet/Pagar" />
+      <form
+        onSubmit={onSubmit}
+        className="flex flex-col gap-4 items-center mx-auto mt-4"
+      >
+        <input
+          type="number"
+          min="0"
+          placeholder="Código de deuda"
+          {...register("CodigoDeuda", { required: true })}
+          className="p-2 rounded border border-gray-300"
+          disabled
+        />
+        {errors.CodigoDeuda && (
+          <span className="text-red-500">Código de deuda requerido</span>
+        )}
+
+        <input
+          type="number"
+          min="0"
+          placeholder="Cantidad de deuda"
+          {...register("MontoPago", { required: true })}
+          className="p-2 rounded border border-gray-300"
+          disabled
+        />
+        {errors.MontoPago && (
+          <span className="text-red-500">Monto de pago requerido </span>
+        )}
+
+        {errorMessage && <span className="text-red-500">{errorMessage}</span>}
+
+        <div className="flex gap-4">
+          <Link
+            to="/Servicios/Internet"
+            className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
+          >
+            Cancelar
+          </Link>
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          >
+            Guardar
+          </button>
+        </div>
+      </form>
+    </>
+  );
+}
+```
+5.3. Sevicio Luz
+> Busqueda.tsx
+```javascript
+import { useEffect, useState } from "react";
+import { obtenerDeudores } from "../../api/internet.api.ts";
+import { Deudor } from "../../Types/internetservice.ts";
+import { Regresar } from "../../components/Regresar";
+
+export function DeudoresInternet() {
+  const [deudas, setDeudas] = useState<Deudor[]>([]); // Especifica el tipo de estado como un array de Deudor
+
+  useEffect(() => {
+    async function cargarDeudas() {
+      const res = await obtenerDeudores();
+      setDeudas(res.data); // Actualiza el estado con los datos de deudas
+    }
+    cargarDeudas();
+  }, []);
+
+  return (
+    <>
+      <Regresar to="/Servicios/Internet" />
+      <div className="flex flex-col gap-4">
+        <h2 className="text-xl font-bold">Lista de deudores</h2>
+
+        <table className="table-auto">
+          <thead>
+            <tr>
+              <th className="border px-4 py-2">Código</th>
+              <th className="border px-4 py-2">Nombre</th>
+              <th className="border px-4 py-2">Apellido</th>
+              <th className="border px-4 py-2">Monto Deuda</th>
+              <th className="border px-4 py-2">Fecha de vencimiento</th>
+              <th className="border px-4 py-2">Estado</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {deudas.map((deuda) => (
+              <tr key={deuda.CodigoDeudInter}>
+                <td className="border px-4 py-2">{deuda.CodigoDeudInter}</td>
+                <td className="border px-4 py-2">{deuda.Nombre}</td>
+                <td className="border px-4 py-2">{deuda.Apellido}</td>
+                <td className="border px-4 py-2">{deuda.MonDeuda}</td>
+                <td className="border px-4 py-2">{deuda.FechVenc}</td>
+                <td className="border px-4 py-2">{deuda.Estado ? "Pagado" : "Pendiente"}</td>
+
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { buscarDeuda } from "../../api/luz.api.ts";
+import { ContentTDeudas } from "../../components/LuzService/ContentTDeudas";
+import { Regresar } from "../../components/Regresar.tsx";
+import { Deuda } from "../../Types/luzservice.ts";
+
+export function Busqueda() {
+  const [deudor, setDeudor] = useState<Deuda | null>(null);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = handleSubmit(async (data) => {
+    const codigoDeuda = data.CodigoDeuda;
+    console.log("Valor de CodigoDeuda:", codigoDeuda); // Imprimir el valor en la consola
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await buscarDeuda(parseInt(codigoDeuda));
+      const deuda = response.data;
+
+      if (deuda) {
+        setDeudor(deuda);
+      } else {
+        setDeudor(null);
+        setError("Deuda no encontrada");
+      }
+    } catch (error) {
+      console.log(error);
+      setDeudor(null);
+      setError("Algo salió mal al obtener la deuda");
+    } finally {
+      setIsLoading(false);
+    }
+  });
+
+  return (
+    <>
+      <Regresar to="/Servicios/Luz" />
+      <div className="mt-4">
+        <form onSubmit={onSubmit}>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg
+                className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                />
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="default-search"
+              {...register("CodigoDeuda", { required: true })}
+              className="block w-full p-4 pl-10 text-lg text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Ingrese el código de la deuda"
+              required
+            />
+            {errors.CodigoDeuda && (
+              <span className="text-red-500">
+                Código de deuda requerido
+              </span>
+            )}
+            <button
+              type="submit"
+              className="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-lg px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              disabled={isLoading}
+            >
+              {isLoading ? "Buscando..." : "Buscar"}
+            </button>
+          </div>
+        </form>
+        <div className="container mx-auto px-4 py-8">
+          {error && <p className="text-red-500">{error}</p>}
+          {deudor && (
+            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+              <table className="w-full text-sm text-left text-gray-300 dark:text-gray-300">
+                <thead className="text-xs text-gray-600 uppercase dark:text-gray-300">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Codigo de deuda
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Cantidad
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Vencimiento
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Estado
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-gray-600">
+                      Accion
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ContentTDeudas
+                    codigo_Deuda={deudor.codigo_deuda}
+                    Monto={deudor.Monto}
+                    FechaVenc={deudor.FechaVencimientoPago}
+                    Estado={deudor.Estado}
+                  
+                  />
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+```
+> Deudas.tsx
+```javascript
+import { useEffect, useState } from "react";
+import { obtenerDeudores } from "../../api/luz.api.ts";
+import { Clientes } from "../../Types/luzservice.ts";
+import { Regresar } from "../../components/Regresar";
+
+export function DeudasLuz() {
+  const [deudas, setDeudas] = useState<Clientes[]>([]);
+
+  useEffect(() => {
+    async function cargarDeudas() {
+      const res = await obtenerDeudores();
+      setDeudas(res.data);
+    }
+    cargarDeudas();
+  }, []);
+
+  return (
+    <>
+      <Regresar to="/Servicios/Luz" />
+      <div className="flex flex-col gap-4">
+        <h2>Lista de deudas</h2>
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead>
+            <tr>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Código deuda
+              </td>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Cantidad deuda
+              </td>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Estado
+              </td>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Fecha de vencimiento
+              </td>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Código del Cliente
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            {deudas.map((deuda) => (
+              <tr key={deuda.CodigoDeuda}>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {deuda.CodigoDeuda}
+                </td>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {deuda.Monto}
+                </td>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {deuda.Estado}
+                </td>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {deuda.FechaVencimientoPago}
+                </td>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {deuda.FkCodigoCliente}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+```
+> InicioLuz.tsx
+```javascript
+import { OpcionesInicio } from "../../components/OpcionesInicio";
+import { Regresar } from "../../components/Regresar";
+
+export function InicioLuz() {
+  return (
+    <div className="flex flex-col">
+      <div>
+      <Regresar to="/Servicios" />
+      </div>
+      <h1 className="text-4xl font-bold mb-24 text-left mt-2">
+        Pagos de Luz
+      </h1>
+      <div className="flex justify-center items-center flex-grow gap-5">
+        <OpcionesInicio to="/Servicios/Luz/RealizarPago" text="Pagar Deuda" />
+        <OpcionesInicio to="/Servicios/Luz/Deudas" text="Deudas" />
+        <OpcionesInicio to="/Servicios/Luz/Pagos" text="Pagos" />
+      </div>
+    </div>
+  );
+}
+```
+> PagoLuz.tsx
+```javascript
+import { Regresar } from "../../components/Regresar";
+import { useEffect, useState } from "react";
+import { obtenerPagos } from "../../api/luz.api.ts";
+import { Pagos } from "../../Types/luzservice.ts";
+
+export function PagosLuz() {
+  const [pagos, setPagos] = useState<Pagos[]>([]);
+
+  useEffect(() => {
+    async function cargarPagos() {
+      const res = await obtenerPagos();
+      setPagos(res.data);
+      console.log(res);
+    }
+    cargarPagos();
+  }, []);
+
+  return (
+    <>
+      <Regresar to="/Servicios/Luz" />
+      <div className="flex flex-col gap-4">
+        <h2>Lista de pagos</h2>
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead>
+            <tr>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Código pago
+              </td>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Monto pago
+              </td>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Fecha de pago
+              </td>
+              <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                Código de deuda
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            {pagos.map((pago) => (
+              <tr key={pago.CodigoPago}>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {pago.CodigoPago}
+                </td>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {pago.Pago}
+                </td>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {pago.FechaPago}
+                </td>
+                <td style={{ borderWidth: "2px" }} className="border px-4 py-2">
+                  {pago.CodigoDeuda}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+```
+> RealizarPago.tsx
+```javascript
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { pagarDeuda } from "../../api/luz.api";
+import { Pagos } from "../../Types/luzservice";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+import { Regresar } from "../../components/Regresar";
+
+export function RealizarPago() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [errorMessage, setErrorMessage] = useState("");
+  const searchParams = new URLSearchParams(location.search);
+  const codigoDeuda = searchParams.get("codigoDeuda");
+  const montoPago = searchParams.get("Monto");
+
+  useEffect(() => {
+    if (codigoDeuda) {
+      setValue("CodigoDeuda", codigoDeuda);
+    }
+    if (montoPago) {
+      setValue("MontoPago", montoPago);
+    }
+  }, [codigoDeuda, montoPago, setValue]);
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      const pagoData: Pagos = {
+        CodigoPago: data.CodigoPago,
+        CodigoDeuda: parseInt(data.CodigoDeuda),
+        Pago: parseInt(data.MontoPago),
+        FechaPago: data.FechaPago,
+      };
+      const res = await pagarDeuda(pagoData);
+      console.log(res);
+
+      const style = {
+        background: "#202033",
+        color: "#fff",
+      };
+
+      toast.success("Pago realizado correctamente", {
+        position: "top-right",
+        style,
+      });
+      navigate("/Servicios/Educacion");
+    } catch (error) {
+      console.log(error);
+
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        setErrorMessage("No se ha encontrado el ID del usuario");
+      } else if (axios.isAxiosError(error) && error.response?.status === 400) {
+        setErrorMessage(error.response.data.mensaje);
+      } else {
+        setErrorMessage((error as Error).message);
+      }
+    }
+  });
+
+  return (
+    <>
+      <Regresar to="/Servicios/Luz" />
+      <form
+        onSubmit={onSubmit}
+        className="flex flex-col gap-4 items-center mx-auto mt-4"
+      >
+        <input
+          type="text"
+          placeholder="Código de pago"
+          {...register("CodigoPago", { required: true })}
+          className="p-2 rounded border border-gray-300"
+        />
+        {errors.CodigoPago && (
+          <span className="text-red-500">Código de pago requerido</span>
+        )}
+
+        <input
+          type="number"
+          min="0"
+          placeholder="Código de deuda"
+          {...register("CodigoDeuda", { required: true })}
+          className="p-2 rounded border border-gray-300"
+        />
+        {errors.CodigoDeuda && (
+          <span className="text-red-500">Código de deuda requerido</span>
+        )}
+
+        <input
+          type="number"
+          min="0"
+          placeholder="Cantidad de pago"
+          {...register("MontoPago", { required: true })}
+          className="p-2 rounded border border-gray-300"
+        />
+        {errors.MontoPago && (
+          <span className="text-red-500">Cantidad de pago requerida</span>
+        )}
+
+        <input
+          type="date"
+          placeholder="Fecha de pago"
+          {...register("FechaPago", { required: true })}
+          className="p-2 rounded border border-gray-300"
+        />
+        {errors.FechaPago && (
+          <span className="text-red-500">Fecha de pago requerida</span>
+        )}
+
+        {errorMessage && <span className="text-red-500">{errorMessage}</span>}
+
+        <div className="flex gap-4">
+          <Link
+            to="/Servicios/Luz"
+            className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
+          >
+            Cancelar
+          </Link>
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          >
+            Pagar
+          </button>
+        </div>
+      </form>
+    </>
+  );
+}
+```
+5.3. Sevicio Telefono
+> Facturas.tsx
+```javascript
+import { useEffect, useState } from "react";
+import { obtenerfactura } from "../../api/Telephony.ts";
+import { Factura } from "../../Types/telephonyservice.ts";
+import { Regresar } from "../../components/Regresar";
+
+export function Facturas() {
+    const [facturas, setFacturas] = useState<Factura[]>([]);
+  
+    useEffect(() => {
+      async function cargarFacturas() {
+        try {
+          const res = await obtenerfactura();
+          setFacturas(res.data);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      cargarFacturas();
+    }, []);
+  
+    return (
+      <>
+        {<Regresar to="/Servicios/Telefonia" />}
+        <div className="flex flex-col gap-4"></div>
+        <h2 className="text-xl font-bold" >Lista de facturas</h2><br></br>
+        <div className="overflow-x-auto">
+        <table className="table-auto w-full">
+          <thead>
+            <tr>
+              <th className="border px-4 py-2">Cliente</th>
+              <th className="border px-4 py-2">Plan</th>
+              <th className="border px-4 py-2">Monto</th>
+              <th className="border px-4 py-2">Fecha de emisión</th>
+              <th className="border px-4 py-2">Fecha de vencimiento</th>
+              <th className="border px-4 py-2">Pagado</th>
+              <th className="border px-4 py-2">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {facturas.map((factura) => (
+              <tr key={factura.id}>
+                <td className="border text-center px-4 py-2">{factura.cliente}</td>
+                <td className="border text-center px-4 py-2">{factura.plan}</td>
+                <td className="border text-center px-4 py-2">{factura.monto}</td>
+                <td className="border text-center px-4 py-2">{factura.fecha_emision}</td>
+                <td className="border text-center px-4 py-2">{factura.fecha_vencimiento}</td>
+                <td className={`border font-bold text-center px-4 py-2 ${factura.pagado ? 'text-green-600' : 'text-orange-500'}`}>{factura.pagado ? 'Sí' : 'No'}</td>
+                <td className="border text-center px-4 py-2">{factura.estado ? 'Activo' : 'Inactivo'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        </div>
+      </>
+    );
+  }
+```
+> IndexService.tsx
+```javascript
+import { OpcionesInicio } from "../../components/OpcionesInicio";
+import { Regresar } from "../../components/Regresar";
+
+export function IndexService() {
+  return (
+    <div className="flex flex-col">
+      <div>
+      <Regresar to="/Servicios" />
+      </div>
+      <h1 className="text-4xl font-bold mb-24 text-left mt-2">
+        Pagos de Telefonia
+      </h1>
+      <div className="flex justify-center items-center rounded-md flex-grow gap-5">
+        <OpcionesInicio to="/Servicios/Telefonia/Facturas" text="Facturas" />
+        <OpcionesInicio to="/Servicios/Telefonia/Planes" text="Recarga" />
+      </div>
+    </div>
+  );
+}
+```
+> Plan.tsx
+```javascript
+import { obtenerplan,elegirplan } from "../../api/Telephony.ts";
+import { Plan } from "../../Types/telephonyservice.ts";
+import { useEffect, useState } from "react";
+import { Regresar } from "../../components/Regresar";
+import { useNavigate } from "react-router-dom";
+
+export function Planes() {
+  const [planes, setPlanes] = useState<Plan[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function cargarPlanes() {
+      try {
+        const res = await obtenerplan();
+        setPlanes(res.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    cargarPlanes();
+  }, []);
+
+  const handleSeleccionarPlan = async (plan_id: number, costo_mensual: number) => {
+    const idcliente = 1;
+    try {
+      // Llamar a la función "elegirplan" y pasar el plan_id y el costo_mensual
+      await elegirplan(idcliente, plan_id, costo_mensual);
+    } catch (error) {
+      console.error(error);
+    }finally {
+      navigate(`/Servicios/Telefonia/RealizarPago?id_cliente=${idcliente}&monto=${costo_mensual}`);
+    }
+  };
+  return (
+    <>
+      <div className="flex flex-col">
+      <div>
+      <Regresar to="/Servicios/Telefonia" />
+      </div>
+      <h1 className="text-4xl font-bold mb-24 text-left mt-2">Elegir tu Plan</h1> 
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4">
+        {planes.map((plan) => (
+          <div
+            key={plan.id}
+            className="bg-white rounded-lg shadow-xl p-6 flex flex-col justify-between"
+          >
+            <h2 className="text-xl font-bold mb-4">{plan.nombre}</h2>
+            <div className="flex flex-col gap-2">
+              <p className="text-gray-700 text-center font-semibold">
+                <span className="font-bold "></span>{" "}
+                S/{plan.costo_mensual}
+              </p><hr />
+              <div className="bg-blue-900 rounded-full py-2 px-4 mt-4 font-bold text-center">
+              <p className="text-neutral-100" >
+                <span className="font-semibold"></span>{" "}
+                {plan.minutos_incluidos} Min
+              </p>
+              <p className="text-neutral-100">
+                <span className="font-semibold"></span>{" "}
+                {plan.datos_incluidos} GB
+              </p>
+              </div>
+            </div>
+            <button className="bg-blue-900 hover:bg-orange-600 text-white font-semibold py-2 px-4 mt-4 rounded-md" onClick={() => handleSeleccionarPlan(plan.id, plan.costo_mensual)}>
+              ¡Me Interesa!
+            </button>
+          </div>
+        ))}
+      </div><br/><br/>
+    </div>
+    </>
+  );
+}
+```
+> RealizarPago.tsx
+```javascript
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { buscarcliente, actualizarsaldo } from "../../api/Telephony.ts";
+import { Regresar } from "../../components/Regresar";
+
+export function RealizarPago() {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const id_cliente = searchParams.get("id_cliente");
+  const monto = searchParams.get("monto");
+
+  const [mensaje, setMensaje] = useState("");
+
+  useEffect(() => {
+    if (id_cliente && monto) {
+      buscarClienteYActualizarSaldo(Number(id_cliente), Number(monto));
+    }
+  }, [id_cliente, monto]);
+
+  const buscarClienteYActualizarSaldo = async (clienteId: number, monto: number) => {
+    try {
+      // Obtener los datos del cliente
+      const res = await buscarcliente(clienteId);
+      const cliente = res.data;
+
+      // Restar el monto a la cuenta bancaria
+      if (cliente.cuenta_bancaria >= monto) {
+        // Restar el monto a la cuenta bancaria
+        const nuevoSaldo = cliente.cuenta_bancaria - monto;
+  
+        // Actualizar los datos del cliente con el nuevo saldo
+        await actualizarsaldo(clienteId, cliente.nombre, cliente.direccion, cliente.telefono, nuevoSaldo, cliente.servicio_activo);
+  
+        setMensaje("Su recarga se realizó exitosamente.");
+      } else {
+        setMensaje("Saldo insuficiente para realizar la recarga.");
+      }
+    } catch (error) {
+      console.error(error);
+      setMensaje("Hubo algun error en su recarga.");
+    }
+  };
+
+  return (
+    <>
+    <div>
+      <Regresar to="/Servicios/Telefonia" />
+    </div>
+    <div className="container mx-auto mt-8">
+    <div className="flex w-100 shadow-lg rounded-lg">
+      <div className="bg-green-600 py-4 px-6 rounded-l-lg flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="text-white fill-current" viewBox="0 0 16 16" width="20" height="20"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg>
+      </div>
+      <div className="px-4 py-6 bg-white rounded-r-lg flex justify-between items-center w-full border border-l-transparent border-gray-200">
+        <div><h1 className="text-4xl font-bold mb-4">{mensaje}</h1></div>
+      </div>
+    </div><br></br>
+      <p className="text-lg font-semibold">ID Cliente: {id_cliente}</p>
+      <p className="text-lg font-semibold">Monto: {monto}</p>
+    </div>
+  
+    </>
+  );
+}
+```
