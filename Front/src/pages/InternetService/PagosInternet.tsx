@@ -111,7 +111,7 @@ export function BusquedaPagoInternet() {
                       CodigoDeudInter={deudor.CodigoDeudInter.toString()}
                       MonDeuda={deudor.MonDeuda}
                       FechVenc={deudor.FechVenc}
-                      Estado={deudor.Estado}
+                      Estado={deudor.Estado?"Pagado":"Pendiente"}
                     />
                   ))}
                 </tbody>
