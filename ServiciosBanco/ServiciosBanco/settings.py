@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     'ServicioEducacion',
     'ServicioInternet',
     'ServicioLuz',
-    'corsheaders'
-
+    'corsheaders',
+    'api_recibos_agua'
 ]
 
 MIDDLEWARE = [

@@ -6,7 +6,7 @@ import { EducacionRoutes } from "./routes/EducacionRoutes";
 import { InternetRoutes } from "./routes/InternetRoutes";
 import { ClienteRoutes } from "./routes/ClienteRoutes";
 import { LuzRoutes } from "./routes/LuzRoutes";
-import { InicioAgua } from "./pages/AguaService/InicioAgua";
+import { DetallesDeudaAgua } from "./pages/AguaService/InicioAgua";
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
           <Route path="/Servicios/Luz/*" element={<LuzRoutes/>} />
           <Route path="/Servicios/Internet/*" element={< InternetRoutes/>} />
           <Route path="/Cliente/*" element={< ClienteRoutes/>} />
-          <Route path="/Servicios/Agua/" element={< InicioAgua/>} />
+          <Route path="/Servicios/Agua/" element={< DetallesDeudaAgua/>} />
         </Routes>
         <Toaster />
       </div>

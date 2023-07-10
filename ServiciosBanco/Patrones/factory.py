@@ -43,7 +43,14 @@ class ServicioInternet(IServicio):
             return {'mensaje': f'Pago Realizado, con Interes de 20% siendo un total de: {deud_inter_pago}', 'status': 200}
         else:
             return {'mensaje': 'Pago Realizado Total', 'status': 200}
-            
+
+class ServicioAgua(IServicio):
+    def __init__(self) -> None:
+        super().__init__()
+    def getDeuda(self, codigo_cliente):
+        if not codigo_cliente:
+            return Response({"error": "El parametro 'codigo_cliente' es obligatorio."}, status=400)
+        pass
 
 class ServicioEducacion(IServicio):
     def __init__(self, pago):
