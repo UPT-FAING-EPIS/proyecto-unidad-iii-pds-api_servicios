@@ -106,11 +106,11 @@ DATABASES = {
     },
       'BaseDatosInternet': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST':'localhost',
+        'HOST':'helbert.info',
         'PORT':'3306',
-        'USER':'root',
-        'PASSWORD':'',
-        'NAME':'servicioInternet',
+        'USER':'APIservicios',
+        'PASSWORD':'serviciosAPI',
+        'NAME':'serviciointernet',
         'OPTIONS':{
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
@@ -138,7 +138,7 @@ DATABASES = {
         }
     },
       'BaseDatosTelefonia': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.mysql', 
         'HOST':'localhost',
         'PORT':'3306',
         'USER':'root',
