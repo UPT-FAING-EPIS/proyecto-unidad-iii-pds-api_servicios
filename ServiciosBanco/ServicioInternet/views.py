@@ -7,14 +7,15 @@ from decimal import Decimal
 from Patrones.factory import DeudInterPagoFactory
 
 
-
 class DeudInterListView(viewsets.ModelViewSet):
     serializer_class = DeudInterSerializer
-    queryset = CuentDeudInter.objects.all()
+
+    def get_queryset(self):
+        return CuentDeudInter.objects.using('BaseDatosInternet').all()
 
 
 class DeudInterPagoView(generics.RetrieveUpdateAPIView):
-    queryset = CuentDeudInter.objects.all()
+    queryset = CuentDeudInter.objects.using('BaseDatosInternet').all()
     serializer_class = DeudInterSerializer2
 
     lookup_field = 'CodigoDeudInter'
@@ -27,9 +28,8 @@ class DeudInterPagoView(generics.RetrieveUpdateAPIView):
             return Response({'error': 'Falta el valor en Monto Pago'}, status=400)
 
         deud_inter = self.get_object()
-        command = DeudInterPagoFactory.create("ServicioInternet",pago)
+        command = DeudInterPagoFactory.create("ServicioInternet", pago)
         result = command.pagar(deud_inter)
-
 
         if result['status'] == 200:
             serializer = self.get_serializer(deud_inter)
