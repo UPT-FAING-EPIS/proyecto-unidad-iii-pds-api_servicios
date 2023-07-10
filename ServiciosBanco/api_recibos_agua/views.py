@@ -5,10 +5,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from api_recibos_agua import models
+from datetime import datetime, timedelta
 class DeudaViews(APIView):
 
-    def get(self, request, *args, **kwargs):
-        codigo_cliente = request.GET.get('codigo_cliente')
+    def post(self, request, *args, **kwargs):
+        codigo_cliente = request.data.get("codigo_cliente")
+        print(codigo_cliente)
         if not codigo_cliente:
             return JsonResponse({"error": "El parametro 'codigo_cliente' es obligatorio."}, status=400)
 
@@ -22,8 +24,8 @@ class DeudaViews(APIView):
 
             recibo_agua = models.ReciboAgua(
                 cliente=codigo_cliente,
-                fecha_emision="",
-                fecha_vencimiento="",
+                fecha_emision=datetime.now(),
+                fecha_vencimiento=datetime.now() + timedelta(days=30),
                 monto=deuda,
                 pagado=False
             )
@@ -32,15 +34,6 @@ class DeudaViews(APIView):
             return JsonResponse({"deuda": deuda})
         else:
             return JsonResponse({"error": "No se encontro informacion de deuda para el cliente."})
-    # ...
-    def post(self, request, *args, **kwargs):
-        return JsonResponse({"error": "Método no permitido."}, status=405)
-
-    def put(self, request, *args, **kwargs):
-        return JsonResponse({"error": "Método no permitido."}, status=405)
-
-    def delete(self, request, *args, **kwargs):
-        return JsonResponse({"error": "Método no permitido."}, status=405)
 
 
 class PagosViews(ListCreateAPIView):
