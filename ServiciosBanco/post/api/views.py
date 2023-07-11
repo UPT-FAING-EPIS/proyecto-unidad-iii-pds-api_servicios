@@ -1,94 +1,106 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
+from decimal import Decimal
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from post.models import Cliente, RegistroLlamadas, Plan, Factura
 from post.api.serializers import ClienteSerializer ,RegistroLlamadasSerializer,PlanSerializer, FacturaSerializer
 from datetime import date, timedelta
-from post.api.FacturaBuilder import FacturaBuilder
-from .factura_facade import FacturaFacade
-from .command import CommandInvoker, CancelarServicioCommand
-from .strategy import UpdateStrategy, DestroyStrategy, ClienteUpdateStrategy
+
+from Patrones.observers import PatterObserverPagos, RabbitObserver
+from Patrones.factory import DeudInterPagoFactory
+
+pattern_observer = PatterObserverPagos()
+
 
 class ClienteViewSet(ModelViewSet):
-    queryset = Cliente.objects.all()
+    queryset = Cliente.objects.using('BaseDatosTelefonia').all()
     serializer_class = ClienteSerializer
-    update_strategy = ClienteUpdateStrategy()
+
 
     @action(detail=True, methods=['put'])
     def cancelar_servicio(self, request, pk=None):
         cliente = self.get_object()
-
-        invoker = CommandInvoker()
-        invoker.set_command(CancelarServicioCommand(cliente))
-        invoker.execute_command()
-
+        cliente.servicio_activo = False
+        cliente.save()
         serializer = self.serializer_class(cliente)
         return Response({'status': 'OK', 'message': 'Servicio cancelado correctamente.'})
-    
+
     def update(self, request, pk=None):
-        return UpdateStrategy().execute(self, request, pk=pk)
+        cliente = self.get_object()
+        serializer = ClienteSerializer(cliente, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=400)
 
 class RegistroLlamadasViewSet(ModelViewSet):
-    queryset = RegistroLlamadas.objects.all()
+    queryset = RegistroLlamadas.objects.using('BaseDatosTelefonia').all()
     serializer_class = RegistroLlamadasSerializer
-    update_strategy = UpdateStrategy()
-    destroy_strategy = DestroyStrategy()
-
-    def update(self, request, pk=None):
-        return self.update_strategy.execute(self, request, pk=pk)
-
-    def destroy(self, request, pk=None):
-        return self.destroy_strategy.execute(self, request, pk=pk)
-
 
 class PlanViewSet(ModelViewSet):
-    queryset = Plan.objects.all()
+    queryset = Plan.objects.using('BaseDatosTelefonia').all()
     serializer_class = PlanSerializer
-    update_strategy = UpdateStrategy()
 
     def update(self, request, pk=None):
-        return self.update_strategy.execute(self, request, pk=pk)
+        plan = self.get_object()
+        serializer = PlanSerializer(plan, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=400)
 
 class FacturaViewSet(ModelViewSet):
-    queryset = Factura.objects.all()
+    queryset = Factura.objects.using('BaseDatosTelefonia').all()
     serializer_class = FacturaSerializer
-    update_strategy = UpdateStrategy()
-    destroy_strategy = DestroyStrategy()
 
-    def update(self, request, *args, **kwargs):
-        return self.update_strategy.execute(self, request, *args, **kwargs)
+    def update(self, request, pk=None):
+        factura = self.get_object()
+        serializer = FacturaSerializer(factura, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=400)
         
     def destroy(self, request, pk=None):
-        return self.destroy_strategy.execute(self, request, pk=pk)
-    
+        factura = self.get_object()
+        factura.delete()
+        return Response({'status': 'OK', 'message': 'Factura eliminada correctamente.'})
 
-@api_view(['POST'])
-def crear_plan_con_factura(request):
-    serializer = PlanSerializer(data=request.data)
-    if serializer.is_valid():
-        plan = serializer.save()
-
+    @action(detail=False, methods=['post'])
+    def activar_plan(self, request):
         cliente_id = request.data.get('cliente_id')
-        cliente = Cliente.objects.get(pk=cliente_id)
+        plan_id = request.data.get('plan_id')
+        monto_pago = request.data.get('monto_pago')
+
+        try:
+            cliente = Cliente.objects.using('BaseDatosTelefonia').get(pk=cliente_id)
+            plan = Plan.objects.using('BaseDatosTelefonia').get(pk=plan_id)
+        except (Cliente.DoesNotExist, Plan.DoesNotExist):
+            return Response({'mensaje': 'Cliente o plan no encontrado.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if Decimal(monto_pago) != Decimal(plan.costo_mensual):
+            return Response({'mensaje': 'El monto del pago no coincide con el costo mensual del plan.'}, status=status.HTTP_400_BAD_REQUEST)
+
         fecha_emision = date.today()
-        dias_vencimiento = 30
-        fecha_vencimiento = fecha_emision + timedelta(days=dias_vencimiento)
-        monto = plan.costo_mensual
+        fecha_vencimiento = fecha_emision + timedelta(days=30)
 
-        factura = FacturaFacade.crear_factura(cliente, plan, fecha_emision, fecha_vencimiento, monto)
+        factura = Factura.objects.using('BaseDatosTelefonia').create(
+            cliente=cliente,
+            plan=plan,
+            monto=monto_pago,
+            fecha_emision=fecha_emision,
+            fecha_vencimiento=fecha_vencimiento,
+            pagado=True,
+            estado=True
+        )
 
-        serializer = FacturaSerializer(factura)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        command = DeudInterPagoFactory.create("ServicioTelefonia",monto_pago)
+        factoria = DeudInterPagoFactory.create("ServicioTelefonia",monto_pago)
+        result = command.pagar(monto_pago)
 
-
-
-@api_view(['POST'])
-def pagar_factura(request):
-    factura_id = request.data['id']
-    FacturaFacade.pagar_factura(factura_id)
-    return Response({'mensaje': 'La factura ha sido pagada.'})
-
+        return Response({'mensaje': result['mensaje']}, status=result['status'])

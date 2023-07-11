@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'ServicioInternet',
     'ServicioLuz',
     'corsheaders',
-    'api_recibos_agua'
+    'api_recibos_agua',
+    'post'
 ]
 
 MIDDLEWARE = [
@@ -138,11 +139,11 @@ DATABASES = {
         }
     },
       'BaseDatosTelefonia': {
-        'ENGINE': 'django.db.backends.mysql', 
-        'HOST':'localhost',
-        'PORT':'3306',
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST':'containers-us-west-83.railway.app',
+        'PORT':'6672',
         'USER':'root',
-        'PASSWORD':'',
+        'PASSWORD':'w1JAfvZnvCKV3FTsAXDQ',
         'NAME':'servicioTelefonia',
         'OPTIONS':{
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"

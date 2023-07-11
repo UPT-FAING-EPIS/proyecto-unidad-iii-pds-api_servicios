@@ -6,6 +6,7 @@ import { EducacionRoutes } from "./routes/EducacionRoutes";
 import { InternetRoutes } from "./routes/InternetRoutes";
 import { ClienteRoutes } from "./routes/ClienteRoutes";
 import { LuzRoutes } from "./routes/LuzRoutes";
+import { TelephonyRoutes } from "./routes/TelephonyRoutes";
 import { DetallesDeudaAgua } from "./pages/AguaService/InicioAgua";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/Servicios/Educacion/*" element={<EducacionRoutes />} />
           <Route path="/Servicios/Luz/*" element={<LuzRoutes/>} />
           <Route path="/Servicios/Internet/*" element={< InternetRoutes/>} />
+          <Route path="/Servicios/Telefonia/*" element={<TelephonyRoutes/>} />
           <Route path="/Cliente/*" element={< ClienteRoutes/>} />
           <Route path="/Servicios/Agua/" element={< DetallesDeudaAgua/>} />
         </Routes>

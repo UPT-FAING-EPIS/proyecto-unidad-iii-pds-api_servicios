@@ -131,8 +131,22 @@ class ServicioLuz(IServicio):
             return {'mensaje': f'Pago Realizado, con interés de 20% siendo un total de: {deud_luz_pago}',
                     'status': 200}
         else:
-            return {'mensaje': 'Pago Realizado Total', 'status': 200}        
-    
+            return {'mensaje': 'Pago Realizado Total', 'status': 200}   
+
+class ServicioTelefonia(IServicio):
+    def __init__(self, pago):
+        self._pago = pago
+
+    def pagar(self, monto_pago):
+
+        observerPagos = PatterObserverPagos()
+        observer = RabbitObserver()
+        
+        observerPagos.attach_observer(observer)
+        observerPagos.notify_observers('Nueva factura creada', 'factura Pagada')
+
+        return {'mensaje': 'Plan activado y factura creada correctamente.',
+                    'status': status.HTTP_201_CREATED}    
     
 class DeudInterPagoFactory:
     def create(nameservicio,pagar):
@@ -144,7 +158,12 @@ class DeudInterPagoFactory:
             
         if (nameservicio == "ServicioLuz"):
             return ServicioLuz(pagar)
-        
+
+        if (nameservicio == "ServicioTelefonia"):
+            return ServicioTelefonia(pagar)
+        else:
+            raise ValueError('Tipo de servicio no válido')
+
         
             
         
